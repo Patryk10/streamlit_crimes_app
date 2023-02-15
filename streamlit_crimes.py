@@ -1,14 +1,12 @@
 import streamlit as st 
 import pandas as pd
 import numpy as np
-from io import BytesIO
 from datetime import date
 import datetime
 import plotly.graph_objs as go
 import folium
 from streamlit_folium import folium_static
 from folium.plugins import MarkerCluster
-import xlsxwriter
 
 
 st.set_page_config(layout="wide")
