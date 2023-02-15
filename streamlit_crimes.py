@@ -90,72 +90,81 @@ with side_bar:
 
 with tab1: 
 
-    df_barplot = add_table.groupby("hour").agg({"Time":"count"}).reset_index()
+    a = len(add_table)
+    b = len(add_table.drop_duplicates(subset = ["IncidntNum"]))
+    N = len(add_table)
+    result = a/b
+    result = np.round(result,3)
 
-    data = [go.Bar(x = df_barplot["hour"], y = df_barplot["Time"],
-                   text = df_barplot["Time"], marker_color='rgb(26, 118, 255)', marker_line_color='rgb(8,48,107)',opacity=0.6)]
-    layout = go.Layout(title = "Crimes divided into hours",
-                       xaxis_title = "Hours",
-                       yaxis_title = "Number of cases",
-                       hovermode = False,
-                      # hoverlabel=dict(
-                      #                    bgcolor="white",
-                      #                    font_size=16,
-                      #                      font_family="Rockwell"),
-                      xaxis = dict(dtick = 1))
+    x1,x2,x3,x4= st.columns(4)
 
+    with x1:
 
-    fig = {"data" : data, "layout" : layout}
+        st.metric(label="Total number of crimes", value= N)
 
-    st.plotly_chart(fig,use_container_width=True)
+    with x2:
+
+        st.metric(label="Number of violations per each crime", value= result)
 
 
-# Map
 
-    col1,col2 = st.columns(2)
+    y1,y2 = st.columns(2)
 
-    with col1:
+    with y1:
 
-        df_map = add_table.copy()
+        df_barplot = add_table.groupby("hour").agg({"Time":"count"}).reset_index()
 
-
-        mean_x = np.mean(df_map["X"])
-        mean_y = np.mean(df_map["Y"])
-
-        m = folium.Map(location = [mean_y, mean_x])
-        marker_cluster = MarkerCluster().add_to(m)
-
-        for index, row in df_map.iterrows():
-
-            folium.CircleMarker([row["Y"], row["X"]], popup = row["Descript"], fill = True).add_to(marker_cluster)
-
-        folium_static(m)
+        data = [go.Bar(x = df_barplot["hour"], y = df_barplot["Time"],
+                    text = df_barplot["Time"], marker_color='rgb(26, 118, 255)', marker_line_color='rgb(8,48,107)',opacity=0.6)]
+        layout = go.Layout(title = "Crimes divided into hours",
+                        xaxis_title = "Hours",
+                        yaxis_title = "Number of cases",
+                        hovermode = False,
+                        # hoverlabel=dict(
+                        #                    bgcolor="white",
+                        #                    font_size=16,
+                        #                      font_family="Rockwell"),
+                        xaxis = dict(dtick = 1))
 
 
-    with col2:
+        fig = {"data" : data, "layout" : layout}
 
-        # crimes number
-        with st.container():
-            a = len(add_table)
-            b = len(add_table.drop_duplicates(subset = ["IncidntNum"]))
-            N = len(add_table)
-            result = a/b
-            result = np.round(result,3)
+        st.plotly_chart(fig,use_container_width=True)
 
 
-            st.metric(label="Total number of crimes", value= N)
-            st.metric(label="Number of violations per each crime", value= result)
-    
+    with y2:
 
         # The most popular crimes
 
-            df_short = add_table.groupby("Descript").agg({"IncidntNum":"count"}, as_index = False)\
-                                                .sort_values(by = "IncidntNum", ascending = False)\
-                                                .head(5)
-            df_short.columns = ["N"]
-            df_short.reset_index(inplace = True)
+        df_short = add_table.groupby("Descript").agg({"IncidntNum":"count"}, as_index = False)\
+                                            .sort_values(by = "IncidntNum", ascending = False)\
+                                            .head(10)
+        df_short.columns = ["N"]
+        df_short.reset_index(inplace = True)
 
-            st.dataframe(df_short)
+        st.dataframe(df_short,use_container_width = True)
+
+# Map
+
+
+
+    df_map = add_table.copy()
+
+
+    mean_x = np.mean(df_map["X"])
+    mean_y = np.mean(df_map["Y"])
+
+    m = folium.Map(location = [mean_y, mean_x])
+    marker_cluster = MarkerCluster().add_to(m)
+
+    for index, row in df_map.iterrows():
+
+        folium.CircleMarker([row["Y"], row["X"]], popup = row["Descript"], fill = True).add_to(marker_cluster)
+
+    folium_static(m,width = 1000)
+
+
+
 
 
 
