@@ -9,7 +9,7 @@ from streamlit_folium import folium_static
 from folium.plugins import MarkerCluster
 
 
-st.set_page_config(layout="wide")
+st.set_page_config(layout="wide",)
 
 df = pd.read_csv("crimes.csv", parse_dates = ["Date"])
 
@@ -135,27 +135,27 @@ with tab1:
     with col2:
 
         # crimes number
+        with st.container():
+            a = len(add_table)
+            b = len(add_table.drop_duplicates(subset = ["IncidntNum"]))
+            N = len(add_table)
+            result = a/b
+            result = np.round(result,3)
 
-        a = len(add_table)
-        b = len(add_table.drop_duplicates(subset = ["IncidntNum"]))
-        N = len(add_table)
-        result = a/b
-        result = np.round(result,3)
 
-
-        st.metric(label="Total number of crimes", value= N)
-        st.metric(label="Number of violations per each crime", value= result)
+            st.metric(label="Total number of crimes", value= N)
+            st.metric(label="Number of violations per each crime", value= result)
     
 
         # The most popular crimes
 
-        df_short = add_table.groupby("Descript").agg({"IncidntNum":"count"}, as_index = False)\
-                                            .sort_values(by = "IncidntNum", ascending = False)\
-                                            .head(5)
-        df_short.columns = ["N"]
-        df_short.reset_index(inplace = True)
+            df_short = add_table.groupby("Descript").agg({"IncidntNum":"count"}, as_index = False)\
+                                                .sort_values(by = "IncidntNum", ascending = False)\
+                                                .head(5)
+            df_short.columns = ["N"]
+            df_short.reset_index(inplace = True)
 
-        st.dataframe(df_short)
+            st.dataframe(df_short)
 
 
 
